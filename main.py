@@ -13,8 +13,8 @@ e = pd.read_excel("Contacts File")
 c = pd.read_excel("Coupon Code File")
 #Add the coupon code column to the email excel file (for simplicity)
 e = e.drop(columns='contact_name')
-e['couponcodes'] = c['Discount Code']
 c = c[c['Status'] != 'Given']
+e['couponcodes'] = list(c['Discount Code'])[:e.shape[0]]
 #Create and send customzied email
 for index, row in e.iterrows():
 
