@@ -5,22 +5,22 @@ from email.mime.application import MIMEApplication
 import smtplib
 
 #Sender's email credentials
-SenderAddress = "Email"
-password = "Password"
+SenderAddress = "Your Email"
+password = "Your Password"
 
 #Read's excel data
-e = pd.read_excel("~/Downloads/contacts.xlsx")
-c = pd.read_excel("~/Downloads/coupons.xlsx")
+e = pd.read_excel("Contact Excel Path")
+c = pd.read_excel("Coupon Code Excel Path")
 #Add the coupon code column to the email excel file (for simplicity)
 e = e.drop(columns='contact_name')
-e = e.replace('mihir_certificate', '/Users/arizsiddiqui/Downloads/mihir_certificate.pdf')
+e = e.replace('mihir_certificate', 'Filepath')
 e['couponcodes'] = c['Discount Code']
 #Create and send customzied email
 for index, row in e.iterrows():
 
     #Setup Multi-part message
     msg = MIMEMultipart()
-    msg['Subject'] = "Test Mails"
+    msg['Subject'] = "Your Subject"
     #Setup Message (Customize as required)
     message= """\
 <html>
@@ -41,9 +41,12 @@ for index, row in e.iterrows():
     msg.attach(attach)
     msg.attach(HTML_Contents)
     msg['To'] = row['contact_email']
+    msg['From'] = SenderAddress
     #send email
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
         print('Mailing to: ' + row['contact_email'], row['couponcodes'])
         smtp.login(SenderAddress, password)
-        #print(msg)
-        smtp.send_message(msg.as_string(), SenderAddress, )
+        smtp.send_message(msg)
+        c.loc[index, 'Status'] = 'Given'
+        
+c.to_excel("Coupon Code Excel Path")
