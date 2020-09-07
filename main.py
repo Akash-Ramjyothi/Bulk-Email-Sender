@@ -11,13 +11,13 @@ password = "Your Password"
 #Read's excel data
 e = pd.read_excel("Contact Excel Path")
 c = pd.read_excel("Coupon Code Excel Path")
+c = c[c['Status'] != 'Given']
 #Add the coupon code column to the email excel file (for simplicity)
 e = e.drop(columns='contact_name')
-e = e.replace('mihir_certificate', 'Filepath')
 e['couponcodes'] = c['Discount Code']
 #Create and send customzied email
 for index, row in e.iterrows():
-
+    
     #Setup Multi-part message
     msg = MIMEMultipart()
     msg['Subject'] = "Your Subject"
@@ -33,7 +33,7 @@ for index, row in e.iterrows():
     #Convert the html string to the actual body
     HTML_Contents = MIMEText(message, 'html')
     #open and initialize the pdf file to attach
-    fo = open(row['certificates'], 'rb')
+    fo = open(row['certificates'] + '.pdf', 'rb')
     attach = MIMEApplication(fo.read(), _subtype='pdf')
     fo.close()
     attach.add_header('Content-Disposition', 'attachment', filename='certificate.pdf')
@@ -48,5 +48,5 @@ for index, row in e.iterrows():
         smtp.login(SenderAddress, password)
         smtp.send_message(msg)
         c.loc[index, 'Status'] = 'Given'
-        
-c.to_excel("Coupon Code Excel Path")
+        c.to_excel("Coupon Code Excel Path")
+
